@@ -24,6 +24,8 @@ vacancy_data = []
 
 #нужно добавить логгирование
 #парсим информацию о вакансиях(нужно сделать так чтоб нас не банило)
+vacancy_data = []
+
 for link in vacancy_links:
     url_vacancy = link
     page_vacancy = requests.get(link) 
@@ -32,10 +34,18 @@ for link in vacancy_links:
     vacancy_info = {}
 
     #Название
-    vacancy_info['Название вакансии'] = soup_vacancy.find('h1', {'class' : 'vacancy-card__title'}, itemprop = 'title').text.strip()
+    name =  soup_vacancy.find('h1', {'class' : 'vacancy-card__title'}, itemprop = 'title')
+    if name:
+        vacancy_info['Название вакансии'] = name.text.strip()
+    else:
+        vacancy_info['Название вакансии'] = soup_vacancy.find('div', {'class' : 'branding-vacancy-card-header__title'}).text.strip()
 
     #Зарплата
-    vacancy_info['Зарплата'] = soup_vacancy.find('h3', {'class' : 'vacancy-card__salary'}).text.replace('\xa0', '')
+    salary = soup_vacancy.find('h3', {'class' : 'vacancy-card__salary'})
+    if salary:
+        vacancy_info['Зарплата'] = salary.text.replace('\xa0', '')
+    else:
+        vacancy_info['Зарплата'] = soup_vacancy.find('div', {'class' : 'branding-vacancy-card-header__salary'}).text.replace('\xa0', '')
 
     #Требуемые навыки
     skills = []
@@ -72,8 +82,9 @@ for link in vacancy_links:
         vacancy_info['Адрес'] = None
     
     #Город работы
-    city = soup_vacancy.find('a',{'class' : "router-link-active"}, href="/", itemprop="item").text
-    vacancy_info['Город'] = city
+    city = soup_vacancy.find('span',{'class' : "vacancy-requirements__city"})
+    if city:
+        vacancy_info['Город'] = city.text
 
     #Категории вакансии(может работать криво)
     categories = []
@@ -81,7 +92,7 @@ for link in vacancy_links:
     for el in soup_vacancy.find_all('span', {'itemprop': 'name'}):
         categories.append(el.text)
 
-    if len(categories) == 5 or (len(categories) == 4 and categories[3] != vacancy_info['Название вакансии']):
+    if len(categories) >= 5 or (len(categories) == 4 and categories[3] != vacancy_info['Название вакансии']):
         vacancy_info['Сфера'] = categories[2]
         vacancy_info['Общее название профессии'] = categories[3]
     elif len(categories) == 4 and categories[2] in vacancy_info['Название вакансии']:
@@ -89,8 +100,20 @@ for link in vacancy_links:
     elif len(categories) == 4:
         vacancy_info['Сфера'] = categories[2]
     
+    #Дополнительная информация(образование и опты работы)
+    info = soup_vacancy.find('div', {'class' : 'vacancy-requirements'})
+    if info:
+        info = info.text.strip().split(',')
+        vacancy_info['Опыт работы'] = info[-2].strip()
+        vacancy_info['Образование'] = info[-1]     
+    else:
+        vacancy_info['Опыт работы'] = soup_vacancy.find('div', {'class' : 'info-table__text'}, itemprop="experienceRequirements").text.strip()
+        vacancy_info['Образование'] = soup_vacancy.find('div', {'class' : 'info-table__text'}, itemprop="educationRequirements").text.strip()
+
+    vacancy_info['Ссылка'] = link
+    
     vacancy_data.append(vacancy_info)
 
 
-df = pd.DataFrame(vacancy_info)
+df = pd.DataFrame(vacancy_data)
 df.to_csv('rabota_ru.csv')
