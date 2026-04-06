@@ -47,6 +47,10 @@ job_names_clean
 
 jobs_data = []
 
+options = Options()
+
+options.add_argument("--disable-gpu")
+options.add_argument("--window-size=1920,1080")
 
 for job_name in job_names_clean:
     driver = wd.Chrome(options=options)
