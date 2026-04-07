@@ -85,8 +85,10 @@ def parse_rabota_ru(cities_dict, output_file):
     options = Options()
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
+    options.page_load_strategy = 'eager'
     
     driver = wd.Chrome(options=options)
+    driver.set_page_load_timeout(40)
     
     data = []
     
@@ -127,9 +129,8 @@ def parse_rabota_ru(cities_dict, output_file):
     return data
 
 
-# Пример использования функции
-# cities = {'Москва': ['https://www.rabota.ru/?page=', 3],
-#        'Санкт-Петербург':['https://spb.rabota.ru/?page=', 3],
-#           'Екатеренбург': ['https://eburg.rabota.ru/?page=', 3], 
-#           'Московская область': ['https://msk-region.rabota.ru/?page=', 3]}
-# parse_rabota_ru(cities, output_file='rabota_ru.csv')
+cities = {'Москва': ['https://www.rabota.ru/?page=', 178],
+          'Санкт-Петербург':['https://spb.rabota.ru/?page=', 93],
+          'Екатеренбург': ['https://eburg.rabota.ru/?page=',57], 
+          'Московская область': ['https://msk-region.rabota.ru/?page=', 97]}
+parse_rabota_ru(cities, output_file='rabota_ru.csv')
