@@ -6,10 +6,15 @@ import time
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
+import logging
+
+logging.basicConfig(level=logging.INFO, filename="rabota_ru.log",filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 def save_vacancies_data(data, output_file):
     df = pd.DataFrame(data)
     df.to_csv(output_file, index=False)
+    logging.info(f"Данные записаны в {output_file}. Всего строк: {len(data)}")
 
 
 def parse_rabota_ru_vacancy_page(vacancy_url):
@@ -96,7 +101,7 @@ def parse_rabota_ru(cities_dict, output_file):
         main_url, pages = value
         for page in range(1, pages + 1):
             url = f"{main_url}{page}"
-            print(f"Обработка страницы {page}: {url}, город: {city}")
+            logging.info(f"Обработка страницы {page}: {url}, город: {city}")
             
             driver.get(url)
             time.sleep(random.uniform(2, 3))
@@ -108,10 +113,12 @@ def parse_rabota_ru(cities_dict, output_file):
                 try:
                     title_el = card.find_element(By.CSS_SELECTOR, "a.vacancy-preview-card__title_border")
                     vacancy_link = title_el.get_attribute("href")
-                except:
+                except Exception:
+                    logging.warning(f"Не удалось получить ссылку из карточки. Страница {page}, город: {city}")
                     vacancy_link = None
 
                 if not vacancy_link:
+                    logging.warning(f"Пустая ссылка на странице {page}, город: {city}")
                     continue
 
                 vacancy_info = parse_rabota_ru_vacancy_page(vacancy_link)
@@ -119,13 +126,13 @@ def parse_rabota_ru(cities_dict, output_file):
                 data.append(vacancy_info)
 
             save_vacancies_data(data, output_file)
-            print(f"Сохранено {len(data)} вакансий в {output_file} после страницы {page}.")
+            logging.info(f"Сохранено {len(data)} вакансий в {output_file} после страницы {page}.")
             
             time.sleep(random.uniform(2, 3))
     
     driver.quit()
     
-    print(f"Собрано вакансий: {len(data)}")
+    logging.info(f"Собрано вакансий: {len(data)}")
     return data
 
 
