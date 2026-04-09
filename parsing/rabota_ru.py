@@ -12,13 +12,20 @@ logging.basicConfig(level=logging.INFO, filename="rabota_ru.log",filemode="w",
                     format="%(asctime)s %(levelname)s %(message)s")
 
 def save_vacancies_data(data, output_file):
+    logging.info(f"Сохранение данных в {output_file}. Текущее количество вакансий: {len(data)}")
     df = pd.DataFrame(data)
     df.to_csv(output_file, index=False)
     logging.info(f"Данные записаны в {output_file}. Всего строк: {len(data)}")
 
 
 def parse_rabota_ru_vacancy_page(vacancy_url):
-    page = requests.get(vacancy_url, timeout=20)
+    logging.info(f"Начало парсинга вакансии: {vacancy_url}")
+    try:
+        page = requests.get(vacancy_url, timeout=20)
+    except requests.RequestException:
+        logging.exception(f"Ошибка при запросе страницы вакансии: {vacancy_url}")
+        raise
+    logging.info(f"Страница вакансии получена. Статус-код: {page.status_code}, ссылка: {vacancy_url}")
     soup_vacancy = BeautifulSoup(page.text, 'html.parser')
 
     vacancy_info = {}
@@ -83,6 +90,10 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
         vacancy_info['Образование'] = edu.text.strip() if edu else None
 
     vacancy_info['Ссылка'] = vacancy_url
+    logging.info(
+        f"Вакансия обработана: {vacancy_info.get('Название вакансии')}, "
+        f"компания: {vacancy_info.get('Компания')}, город: {vacancy_info.get('Город')}"
+    )
     return vacancy_info
 
 
@@ -92,6 +103,7 @@ def parse_rabota_ru(cities_dict, output_file):
     options.add_argument("--window-size=1920,1080")
     options.page_load_strategy = 'eager'
     
+    logging.info(f"Запуск парсинга rabota.ru. Количество городов: {len(cities_dict)}")
     driver = wd.Chrome(options=options)
     driver.set_page_load_timeout(40)
     
@@ -99,14 +111,22 @@ def parse_rabota_ru(cities_dict, output_file):
     
     for city, value in cities_dict.items():
         main_url, pages = value
+        logging.info(f"Начало обработки города: {city}. Всего страниц: {pages}")
         for page in range(1, pages + 1):
             url = f"{main_url}{page}"
             logging.info(f"Обработка страницы {page}: {url}, город: {city}")
             
-            driver.get(url)
+            try:
+                driver.get(url)
+            except Exception:
+                logging.exception(f"Ошибка при открытии страницы {page} для города {city}: {url}")
+                raise
             time.sleep(random.uniform(2, 3))
             
             cards = driver.find_elements(By.CSS_SELECTOR, ".vacancy-preview-card")
+            logging.info(f"Найдено вакансий: {len(cards)} на странице {page}, город: {city}")
+            if not cards:
+                logging.warning(f"На странице {page}, город: {city}, вакансий не найдены.")
             
             for card in cards:
                 vacancy_link = None
@@ -129,6 +149,7 @@ def parse_rabota_ru(cities_dict, output_file):
             logging.info(f"Сохранено {len(data)} вакансий в {output_file} после страницы {page}.")
             
             time.sleep(random.uniform(2, 3))
+        logging.info(f"Завершена обработка города: {city}. Текущее количество вакансий: {len(data)}")
     
     driver.quit()
     
