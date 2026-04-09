@@ -101,4 +101,4 @@ for job_name in job_names_clean:
 
 
 df = pd.DataFrame(jobs_data)
-df.to_csv('we_work_remotely_jobs.csv')
+df.to_csv('../datasets/we_work_remotely_jobs.csv', index=False)

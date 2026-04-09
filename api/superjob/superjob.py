@@ -238,6 +238,6 @@ def main():
 
     df = vacancies_to_df(detailed_vacancies)
 
-    df.to_csv('superjob_vacancies.csv', index=False)
+    df.to_csv('../../datasets/superjob_vacancies.csv', index=False)
 
 main()
