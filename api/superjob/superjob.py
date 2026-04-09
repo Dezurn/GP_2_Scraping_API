@@ -1,9 +1,13 @@
+import logging
+
 import requests
 import json
 import time
 import pandas as pd
 from config import APP_SECRET_KEY, USER_AGENT, BASE_URL
 
+logging.basicConfig(level=logging.INFO, filename="superjob_api.log",filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 def get_headers():
     headers = {

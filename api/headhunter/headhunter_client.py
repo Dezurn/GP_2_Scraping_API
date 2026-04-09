@@ -1,6 +1,10 @@
+import logging
+
 import requests
 from api.headhunter.config import USER_AGENT, BASE_URL
 
+logging.basicConfig(level=logging.INFO, filename="headhunter_api.log",filemode="w",
+                    format="%(asctime)s %(levelname)s %(message)s")
 
 def get_headers():
     headers = {
@@ -43,4 +47,11 @@ def get_vacancy(vacancy_id):
 
 
 def get_res_by_request_and_headers(request, headers):
-    return requests.get(request, headers=headers).json()
+    logging.info(f"Начало отправки запроса: {request}")
+    try:
+        response = requests.get(request, headers=headers, timeout=20)
+    except requests.RequestException:
+        logging.exception(f"Ошибка запроса: {request}")
+        raise
+    logging.info(f"Ответ получен, запрос: {request}")
+    return response.json()
