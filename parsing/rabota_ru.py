@@ -140,4 +140,4 @@ cities = {'Москва': ['https://www.rabota.ru/?page=', 178],
           'Санкт-Петербург':['https://spb.rabota.ru/?page=', 93],
           'Екатеренбург': ['https://eburg.rabota.ru/?page=',57], 
           'Московская область': ['https://msk-region.rabota.ru/?page=', 97]}
-parse_rabota_ru(cities, output_file='rabota_ru.csv')
+parse_rabota_ru(cities, output_file='../datasets/rabota_ru.csv')
