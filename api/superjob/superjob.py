@@ -84,7 +84,7 @@ def get_metro(town_id):
     
     return get_res_by_request_and_headers(request, headers)
 
-def vacancies_to_df(vacancies, region):
+def vacancies_to_df(vacancies):
     rows = []
     companies_info = {}
 
