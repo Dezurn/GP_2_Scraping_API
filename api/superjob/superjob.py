@@ -126,7 +126,7 @@ def vacancies_to_df(vacancies):
                 metro.append(m.get('title'))
         
         if v.get('catalogues'):
-            for cat in v.get('catalogues')[0]:
+            for cat in v.get('catalogues'):
                 category.append(cat.get('title'))
                 for det_cat in cat.get('positions'):
                     deteiled_categories.append(det_cat.get('title'))
