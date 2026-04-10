@@ -23,9 +23,9 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
     try:
         page = requests.get(vacancy_url, timeout=20)
     except requests.RequestException:
-        logging.exception(f"Ошибка при запросе страницы вакансии: {vacancy_url}")
+        logging.exception(f"Ошибка при запросе вакансии: {vacancy_url}")
         raise
-    logging.info(f"Страница вакансии получена. Статус-код: {page.status_code}, ссылка: {vacancy_url}")
+    logging.info(f"Страница вакансии получена. Ссылка: {vacancy_url}")
     soup_vacancy = BeautifulSoup(page.text, 'html.parser')
 
     vacancy_info = {}
