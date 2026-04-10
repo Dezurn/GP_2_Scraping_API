@@ -51,7 +51,7 @@ def get_res_by_request_and_headers(request, headers):
     try:
         response = requests.get(request, headers=headers, timeout=20)
     except requests.RequestException:
-        logging.exception(f"Ошибка запроса: {request}")
+        logging.exception(f"Ошибка, нет положительного ответа на  запрос: {request}")
         raise
-    logging.info(f"Ответ получен, запрос: {request}")
+    logging.info(f"Ответ успешно получен, запрос: {request}")
     return response.json()

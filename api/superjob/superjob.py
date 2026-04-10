@@ -1,5 +1,5 @@
 import logging
-
+import requests
 import requests
 import json
 import time
@@ -165,7 +165,14 @@ def vacancies_to_df(vacancies):
     return pd.DataFrame(rows)
 
 def get_res_by_request_and_headers(request, headers):
-    return requests.get(request, headers=headers).json()
+    logging.info(f"Отправка запроса: {request}")
+    try:
+        response = requests.get(request, headers=headers, timeout=20)
+    except requests.RequestException:
+        logging.exception(f"Ошибка, нет положительного ответа на запрос: {request}")
+        raise
+    logging.info(f"Ответ успешно получен, запрос: {request}")
+    return response.json()
 
 
 def main():
@@ -201,11 +208,12 @@ def main():
         for cat_id in cat_ids:
             page = 0
             while True:
-                print(cat_id, page, town_id)
+                logging.info(f"Обработка категории: {cat_id}, страница: {page}, город: {town_id}")
                 response = get_vacancies_page(page, 100, town=town_id, catalogue=cat_id)
                 vacancies = response.get('objects', [])
 
                 if not vacancies:
+                    logging.warning(f"Пустая страница: {page}. Вакансий не найдено")
                     break
 
                 all_vacancies += vacancies
@@ -215,11 +223,12 @@ def main():
         for cat_id in cat_ids:
             page = 0
             while True:
-                print(cat_id, page, region_id)
+                logging.info(f"Обработка категории: {cat_id}, страница: {page}, регион: {region_id}")
                 response = get_vacancies_page_by_region(page, 100, region=region_id, catalogue=cat_id)
                 vacancies = response.get('objects', [])
 
                 if not vacancies:
+                    logging.warning(f"Пустая страница: {page}. Вакансий не найдено")
                     break
 
                 all_vacancies += vacancies
@@ -230,18 +239,19 @@ def main():
     cnt = 1
     for v in all_vacancies:
         if cnt % 40 == 0:
+            logging.info(f"Промежуточное сохранение вакансий в файл. Обработано вакансий: {len(detailed_vacancies)}")
             df = vacancies_to_df(detailed_vacancies)
             df.to_csv(output_file, index=False)
             
         id = v.get('id')
-        print(cnt)
+        logging.info(f"Обработка конкретной вакансии: {cnt}")
         if id:
             detailed = get_vacancy(id)
             detailed_vacancies.append(detailed)
             cnt += 1
 
     df = vacancies_to_df(detailed_vacancies)
-
+    logging.info(f"Сохранение полученных данных в файл. Всего вакансий: {len(detailed_vacancies)}")
     df.to_csv('../../datasets/superjob_vacancies.csv', index=False)
 
 main()
