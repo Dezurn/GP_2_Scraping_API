@@ -5,9 +5,17 @@
 по вакансиям на таких сайтах, как:
 - `rabota.ru`
 - `superjob.ru`
-### В результате работы были получены такие карты:
-[![Карта вакансий](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/all_vacancies_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/all_vacancies_clusters.html)
-
+## В результате работы были получены такие карты:
+[!['Карта вакансий'](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/all_vacancies_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/all_vacancies_clusters.html)
+### Полная карта вакансий
+[!['Карта вакансий'](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/metro_vacancies_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/metro_vacancies.html)
+### Карта вакансий по станция метро
+[!['Карта вакансий'](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/rabota_ru_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/rabota_ru_clusters.html)
+### Карта вакансий rabota_ru_clusters
+[!['Карта вакансий'](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/rabota_ry_dots_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/rabota_ru_dots.html)
+### Карта вакансий rabota_ru_dots
+[!['Карта вакансий'](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/superjob_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/superjob_clusters.html)
+### Карта вакансий superjob
 ## Участники проекта:
 - Литвак Максим, ББИ234
 - Большаков Владислав, ББИ234
