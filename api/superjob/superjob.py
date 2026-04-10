@@ -171,7 +171,7 @@ def get_res_by_request_and_headers(request, headers):
 def main():
     output_file = 'superjob_vacancies.csv'
 
-    cities = ['санкт-петербург','екатеринбург'] #москву не добавляем, так как она учитывается в МО
+    cities = ['санкт-петербург','екатеринбург','москва']
     town_ids = []
 
     regions = ['московская область']
