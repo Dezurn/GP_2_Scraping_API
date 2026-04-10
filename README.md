@@ -5,6 +5,9 @@
 по вакансиям на таких сайтах, как:
 - `rabota.ru`
 - `superjob.ru`
+### В результате работы были получены такие карты:
+[![Карта вакансий](https://github.com/Dezurn/GP_2_Scraping_API/blob/main/maps_photo/all_vacancies_photo.png)](https://Dezurn.github.io/GP_2_Scraping_API/maps/all_vacancies_clusters.html)
+
 ## Участники проекта:
 - Литвак Максим, ББИ234
 - Большаков Владислав, ББИ234
