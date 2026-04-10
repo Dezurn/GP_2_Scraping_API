@@ -23,13 +23,14 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
     try:
         page = requests.get(vacancy_url, timeout=20)
     except requests.RequestException:
-        logging.exception(f"Ошибка при запросе вакансии: {vacancy_url}")
+        logging.exception(f"Ошибка при запросе страницы вакансии: {vacancy_url}")
         raise
-    logging.info(f"Страница вакансии получена. Ссылка: {vacancy_url}")
+    logging.info(f"Страница вакансии получена. Статус-код: {page.status_code}, ссылка: {vacancy_url}")
     soup_vacancy = BeautifulSoup(page.text, 'html.parser')
 
     vacancy_info = {}
 
+    #поиск названия
     name = soup_vacancy.find('h1', {'class': 'vacancy-card__title'}, itemprop='title')
     if name:
         vacancy_info['Название вакансии'] = name.text.strip()
@@ -37,6 +38,7 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
         title = soup_vacancy.find('div', {'class': 'branding-vacancy-card-header__title'})
         vacancy_info['Название вакансии'] = title.text.strip() if title else None
 
+    #поиск зарплаты
     salary = soup_vacancy.find('h3', {'class': 'vacancy-card__salary'})
     if salary:
         vacancy_info['Зарплата'] = salary.text.replace('\xa0', '').strip()
@@ -44,17 +46,21 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
         salary = soup_vacancy.find('div', {'class': 'branding-vacancy-card-header__salary'})
         vacancy_info['Зарплата'] = salary.text.replace('\xa0', '').strip() if salary else None
 
+    #поиск навыков и тегов
     vacancy_info['Требуемые навыки'] = [skill.text.strip() for skill in soup_vacancy.find_all('div', {'class': 'vacancy-card__skills-item'})]
     vacancy_info['Теги'] = [tag.text.strip() for tag in soup_vacancy.find_all('div', {'class': 'vacancy-tags__tag'})]
 
+    #поиск названия компании
     company = soup_vacancy.find('a', itemprop='legalName')
     vacancy_info['Компания'] = company.text.strip() if company else None
 
+    #поиск адреса и метро
     vacancy_info['Метро'] = [station.text.strip() for station in soup_vacancy.find_all('span', {'class': 'vacancy-locations__station'})]
 
     address = soup_vacancy.find('div', {'class': 'vacancy-locations__address'}, itemprop='address')
     vacancy_info['Адрес'] = address.text.strip() if address else None
 
+    #поиск названия города
     city = soup_vacancy.find('span', {'class': 'vacancy-requirements__city'})
     if city:
         vacancy_info['Город'] = city.text.strip()
@@ -62,6 +68,7 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
         city = soup_vacancy.find('a', {'class': 'router-link-active', 'href': '/', 'itemprop': 'item'})
         vacancy_info['Город'] = city.text.strip() if city else None
 
+    #парсинг категорий, они могут быть поразному написаны, поэтому тут хардкодинг
     categories = [el.text.strip() for el in soup_vacancy.find_all('span', {'itemprop': 'name'})]
     if len(categories) >= 5 or (len(categories) == 4 and categories[3] != vacancy_info.get('Название вакансии')):
         vacancy_info['Сфера'] = categories[2]
@@ -71,6 +78,7 @@ def parse_rabota_ru_vacancy_page(vacancy_url):
     elif len(categories) == 4:
         vacancy_info['Сфера'] = categories[2]
 
+    #тут также может быть различный формат(
     info = soup_vacancy.find('div', {'class': 'vacancy-requirements'})
     if info:
         info_parts = [part.strip() for part in info.text.strip().split(',') if part.strip()]
